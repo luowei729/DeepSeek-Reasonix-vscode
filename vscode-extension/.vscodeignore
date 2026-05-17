@@ -1,0 +1,11 @@
+src/**
+*.ts
+*.map
+tsconfig.json
+esbuild.mjs
+scripts/**
+node_modules/**
+.vscode-test/**
+**/*.map
+.gitignore
+reasonix/**/*.map

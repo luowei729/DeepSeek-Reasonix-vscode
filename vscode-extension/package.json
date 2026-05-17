@@ -1,0 +1,121 @@
+{
+  "name": "reasonix-vscode",
+  "displayName": "Reasonix",
+  "description": "VS Code extension wrapper for Reasonix with encrypted GitHub cloud sync.",
+  "version": "0.1.0",
+  "publisher": "reasonix-local",
+  "private": true,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/esengine/DeepSeek-Reasonix.git"
+  },
+  "engines": {
+    "vscode": "^1.95.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished",
+    "onView:reasonix.chatView",
+    "onCommand:reasonix.openChat",
+    "onCommand:reasonix.openChatPanel",
+    "onCommand:reasonix.chat.newSession",
+    "onCommand:reasonix.chat.selectSession",
+    "onCommand:reasonix.openSettings",
+    "onCommand:reasonix.providers.configure",
+    "onCommand:reasonix.providers.select",
+    "onCommand:reasonix.models.select",
+    "onCommand:reasonix.models.selectMode",
+    "onCommand:reasonix.indexing.open",
+    "onCommand:reasonix.indexing.build",
+    "onCommand:reasonix.indexing.rebuild",
+    "onCommand:reasonix.indexing.stop",
+    "onCommand:reasonix.indexing.refresh",
+    "onCommand:reasonix.permissions.open",
+    "onCommand:reasonix.permissions.clear",
+    "onCommand:reasonix.review.open",
+    "onCommand:reasonix.review.refresh",
+    "onCommand:reasonix.cloudSync.configure",
+    "onCommand:reasonix.cloudSync.syncNow",
+    "onCommand:reasonix.cloudSync.unlock",
+    "onCommand:reasonix.cloudSync.restore",
+    "onCommand:reasonix.cloudSync.restoreSnapshot"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "reasonix",
+          "title": "Reasonix",
+          "icon": "media/reasonix.svg"
+        }
+      ]
+    },
+    "views": {
+      "reasonix": [
+        {
+          "id": "reasonix.chatView",
+          "type": "webview",
+          "name": "聊天",
+          "contextualTitle": "Reasonix Chat"
+        }
+      ]
+    },
+    "commands": [
+      { "command": "reasonix.openChat", "title": "Reasonix: Open Chat" },
+      { "command": "reasonix.openChatPanel", "title": "Reasonix: Open Chat Panel" },
+      { "command": "reasonix.chat.newSession", "title": "Reasonix: New Chat Session" },
+      { "command": "reasonix.chat.selectSession", "title": "Reasonix: Select Chat Session" },
+      { "command": "reasonix.openSettings", "title": "Reasonix: Open Settings" },
+      { "command": "reasonix.providers.configure", "title": "Reasonix: Configure API Provider" },
+      { "command": "reasonix.providers.select", "title": "Reasonix: Select API Provider" },
+      { "command": "reasonix.models.select", "title": "Reasonix: Select Model" },
+      { "command": "reasonix.models.selectMode", "title": "Reasonix: Select Model Mode (Reasoning)" },
+      { "command": "reasonix.indexing.open", "title": "Reasonix: Open Code Indexing" },
+      { "command": "reasonix.indexing.build", "title": "Reasonix: Build Code Index" },
+      { "command": "reasonix.indexing.rebuild", "title": "Reasonix: Rebuild Code Index" },
+      { "command": "reasonix.indexing.stop", "title": "Reasonix: Stop Code Indexing" },
+      { "command": "reasonix.indexing.refresh", "title": "Reasonix: Refresh Code Index Status" },
+      { "command": "reasonix.permissions.open", "title": "Reasonix: Manage Permissions" },
+      { "command": "reasonix.permissions.clear", "title": "Reasonix: Clear Permission Rules" },
+      { "command": "reasonix.review.open", "title": "Reasonix: Open Diff Review" },
+      { "command": "reasonix.review.refresh", "title": "Reasonix: Refresh Diff Review" },
+      { "command": "reasonix.cloudSync.configure", "title": "Reasonix: Configure Cloud Sync" },
+      { "command": "reasonix.cloudSync.syncNow", "title": "Reasonix: Cloud Sync Now" },
+      { "command": "reasonix.cloudSync.unlock", "title": "Reasonix: Unlock Cloud Sync Password" },
+      { "command": "reasonix.cloudSync.restore", "title": "Reasonix: Restore Cloud Sync Backup" },
+      { "command": "reasonix.cloudSync.restoreSnapshot", "title": "Reasonix: Restore Cloud Sync Snapshot" }
+    ],
+    "configuration": {
+      "title": "Reasonix",
+      "properties": {
+        "reasonix.nodePath": {
+          "type": "string",
+          "default": "node",
+          "description": "Node.js executable used to run the bundled Reasonix CLI. Node 22+ is required by Reasonix."
+        },
+        "reasonix.cliPath": {
+          "type": "string",
+          "default": "",
+          "description": "Optional external reasonix CLI path. Leave empty to use the bundled CLI staged into the VSIX."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "node esbuild.mjs",
+    "test": "node scripts/smoke-test.mjs",
+    "package": "npm run build && node scripts/stage-reasonix.mjs && vsce package --out dist/reasonix-vscode.vsix"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^22.9.0",
+    "@types/vscode": "^1.95.0",
+    "@vscode/vsce": "^3.2.1",
+    "esbuild": "^0.21.5",
+    "typescript": "^5.6.3"
+  }
+}

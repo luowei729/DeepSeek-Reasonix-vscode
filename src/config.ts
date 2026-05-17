@@ -755,6 +755,10 @@ export function mouseClipboardHintShown(path: string = defaultConfigPath()): boo
 
 /** Unknown / missing fall back to "max" so hand-edited bad config can't silently override the default. */
 export function loadReasoningEffort(path: string = defaultConfigPath()): ReasoningEffort {
+  // VS Code extension sessions inject this environment override so model mode
+  // can change per ACP child process without mutating the user's CLI config.
+  const env = process.env.REASONIX_REASONING_EFFORT?.trim().toLowerCase();
+  if (env === "high" || env === "max") return env;
   const v = readConfig(path).reasoningEffort;
   return v === "high" ? "high" : "max";
 }

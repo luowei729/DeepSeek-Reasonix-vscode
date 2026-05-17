@@ -7,6 +7,10 @@ export function isThinkingModeModel(model: string): boolean {
 
 /** Pins extra_body.thinking.type; `undefined` lets third-party endpoints skip the field. */
 export function thinkingModeForModel(model: string): "enabled" | "disabled" | undefined {
+  // VS Code extension runs Reasonix ACP as a child process and sets this env
+  // value for per-window thinking mode without editing global config files.
+  const env = process.env.REASONIX_THINKING?.trim().toLowerCase();
+  if (env === "enabled" || env === "disabled") return env;
   if (model === "deepseek-chat") return "disabled";
   if (model.includes("reasoner")) return "enabled";
   if (model === "deepseek-v4-flash" || model === "deepseek-v4-pro") return "enabled";
