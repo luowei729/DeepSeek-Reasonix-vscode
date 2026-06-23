@@ -1,0 +1,727 @@
+/**
+ * Reasonix VS Code 扩展 - 设计系统 CSS
+ *
+ * 包含设计令牌、颜色、间距、圆角、阴影、动画等
+ * 统一两个 Webview 的视觉风格
+ *
+ * 使用方式：在 HTML 的 <style> 标签内通过 @import 引入
+ * 图标系统：使用 VS Code 内置 Codicons，无需额外引入
+ */
+
+/* ==================== 基础变量 ==================== */
+:root {
+  /* 颜色 - VS Code 变量封装 */
+  --rx-bg-primary: var(--vscode-editor-background);
+  --rx-bg-secondary: var(--vscode-sideBar-background);
+  --rx-bg-tertiary: var(--vscode-editorWidget-background);
+  --rx-bg-hover: var(--vscode-list-hoverBackground);
+  --rx-bg-active: var(--vscode-list-activeSelectionBackground);
+  --rx-bg-input: var(--vscode-input-background);
+
+  /* 文字颜色 */
+  --rx-fg-primary: var(--vscode-foreground);
+  --rx-fg-secondary: var(--vscode-descriptionForeground);
+  --rx-fg-muted: var(--vscode-disabledForeground);
+  --rx-fg-input: var(--vscode-input-foreground);
+
+  /* 强调色 */
+  --rx-accent: var(--vscode-focusBorder);
+  --rx-accent-secondary: var(--vscode-button-secondaryBackground);
+  --rx-accent-hover: var(--vscode-button-hoverBackground);
+  --rx-btn-primary-bg: var(--vscode-button-background);
+  --rx-btn-primary-fg: var(--vscode-button-foreground);
+  --rx-btn-secondary-bg: var(--vscode-button-secondaryBackground);
+  --rx-btn-secondary-fg: var(--vscode-button-secondaryForeground);
+
+  /* 状态色 */
+  --rx-success: var(--vscode-testing-iconPassed);
+  --rx-warning: var(--vscode-charts-yellow);
+  --rx-error: var(--vscode-editorError-foreground);
+  --rx-info: var(--vscode-textPreformat-foreground);
+
+  /* 边框 */
+  --rx-border: var(--vscode-panel-border);
+  --rx-border-subtle: color-mix(in srgb, var(--vscode-panel-border) 50%, transparent);
+  --rx-border-input: var(--vscode-input-border);
+  --rx-focus-border: var(--vscode-focusBorder);
+
+  /* 代码块背景 */
+  --rx-code-bg: var(--vscode-textCodeBlock-background);
+
+  /* ==================== 间距系统 ==================== */
+  --rx-space-xs: 4px;
+  --rx-space-sm: 8px;
+  --rx-space-md: 12px;
+  --rx-space-lg: 16px;
+  --rx-space-xl: 24px;
+  --rx-space-2xl: 32px;
+
+  /* ==================== 圆角系统 ==================== */
+  --rx-radius-sm: 4px;
+  --rx-radius-md: 6px;
+  --rx-radius-lg: 10px;
+  --rx-radius-xl: 14px;
+  --rx-radius-full: 9999px;
+
+  /* ==================== 阴影系统 ==================== */
+  --rx-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12);
+  --rx-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --rx-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.2);
+
+  /* ==================== 动画系统 ==================== */
+  --rx-transition-fast: 0.15s ease;
+  --rx-transition-normal: 0.25s ease;
+  --rx-transition-slow: 0.35s ease;
+
+  /* ==================== 字号系统 ==================== */
+  --rx-font-xs: 11px;
+  --rx-font-sm: 12px;
+  --rx-font-md: 13px;
+  --rx-font-lg: 14px;
+  --rx-font-xl: 16px;
+  --rx-font-2xl: 20px;
+
+  /* ==================== 行高 ==================== */
+  --rx-line-height-tight: 1.4;
+  --rx-line-height-normal: 1.5;
+  --rx-line-height-relaxed: 1.6;
+}
+
+/* ==================== 基础重置 ==================== */
+.rx-reset {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.rx-reset *,
+.rx-reset *::before,
+.rx-reset *::after {
+  box-sizing: border-box;
+}
+
+.rx-reset body {
+  font-family: var(--vscode-font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+  font-size: var(--rx-font-md);
+  line-height: var(--rx-line-height-normal);
+  color: var(--rx-fg-primary);
+  background: var(--rx-bg-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ==================== 布局容器 ==================== */
+.rx-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.rx-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ==================== 按钮基础 ==================== */
+.rx-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--rx-space-sm);
+  padding: var(--rx-space-sm) var(--rx-space-md);
+  border: none;
+  border-radius: var(--rx-radius-md);
+  font-family: inherit;
+  font-size: var(--rx-font-md);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--rx-transition-fast);
+  user-select: none;
+}
+
+.rx-btn:focus {
+  outline: none;
+}
+
+.rx-btn:focus-visible {
+  outline: 2px solid var(--rx-focus-border);
+  outline-offset: 2px;
+}
+
+.rx-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 主要按钮 */
+.rx-btn-primary {
+  background: var(--rx-btn-primary-bg);
+  color: var(--rx-btn-primary-fg);
+}
+
+.rx-btn-primary:hover:not(:disabled) {
+  background: var(--rx-accent-hover);
+  transform: translateY(-1px);
+}
+
+/* 次要按钮 */
+.rx-btn-secondary {
+  background: var(--rx-btn-secondary-bg);
+  color: var(--rx-btn-secondary-fg);
+}
+
+.rx-btn-secondary:hover:not(:disabled) {
+  background: var(--rx-accent-hover);
+}
+
+/* 幽灵按钮 */
+.rx-btn-ghost {
+  background: transparent;
+  color: var(--rx-fg-secondary);
+}
+
+.rx-btn-ghost:hover:not(:disabled) {
+  background: var(--rx-bg-hover);
+  color: var(--rx-fg-primary);
+}
+
+/* 图标按钮 */
+.rx-btn-icon {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: var(--rx-radius-md);
+  background: transparent;
+  color: var(--rx-fg-secondary);
+  border: none;
+  cursor: pointer;
+  transition: all var(--rx-transition-fast);
+}
+
+.rx-btn-icon:hover:not(:disabled) {
+  background: var(--rx-bg-hover);
+  color: var(--rx-fg-primary);
+}
+
+.rx-btn-icon:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+/* ==================== 输入框 ==================== */
+.rx-input {
+  width: 100%;
+  padding: var(--rx-space-sm) var(--rx-space-md);
+  border: 1px solid var(--rx-border-input);
+  border-radius: var(--rx-radius-md);
+  background: var(--rx-bg-input);
+  color: var(--rx-fg-input);
+  font-family: inherit;
+  font-size: var(--rx-font-md);
+  transition: border-color var(--rx-transition-fast), box-shadow var(--rx-transition-fast);
+}
+
+.rx-input::placeholder {
+  color: var(--rx-fg-muted);
+}
+
+.rx-input:focus {
+  outline: none;
+  border-color: var(--rx-focus-border);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--rx-focus-border) 20%, transparent);
+}
+
+/* ==================== 选择框 ==================== */
+.rx-select {
+  padding: var(--rx-space-sm) var(--rx-space-md);
+  padding-right: var(--rx-space-xl);
+  border: 1px solid var(--rx-border-input);
+  border-radius: var(--rx-radius-md);
+  background: var(--rx-bg-input);
+  color: var(--rx-fg-input);
+  font-family: inherit;
+  font-size: var(--rx-font-md);
+  cursor: pointer;
+  transition: border-color var(--rx-transition-fast);
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 16 16'%3E%3Cpath fill='%23ccc' d='M4.427 7.427l3.396 3.396a.25.25 0 00.354 0l3.396-3.396A.25.25 0 0011.396 7H4.604a.25.25 0 00-.177.427z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+}
+
+.rx-select:hover {
+  border-color: var(--rx-focus-border);
+}
+
+.rx-select:focus {
+  outline: none;
+  border-color: var(--rx-focus-border);
+}
+
+/* ==================== 卡片 ==================== */
+.rx-card {
+  background: var(--rx-bg-secondary);
+  border: 1px solid var(--rx-border);
+  border-radius: var(--rx-radius-lg);
+  padding: var(--rx-space-lg);
+  box-shadow: var(--rx-shadow-sm);
+}
+
+/* ==================== 标签页 ==================== */
+.rx-tabs {
+  display: flex;
+  gap: var(--rx-space-xs);
+  border-bottom: 1px solid var(--rx-border);
+  padding: 0 var(--rx-space-sm);
+}
+
+.rx-tab {
+  padding: var(--rx-space-sm) var(--rx-space-md);
+  border: none;
+  background: transparent;
+  color: var(--rx-fg-secondary);
+  font-family: inherit;
+  font-size: var(--rx-font-sm);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  position: relative;
+  transition: color var(--rx-transition-fast);
+}
+
+.rx-tab:hover {
+  color: var(--rx-fg-primary);
+}
+
+.rx-tab.active {
+  color: var(--rx-fg-primary);
+}
+
+.rx-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--rx-accent);
+  border-radius: 1px 1px 0 0;
+}
+
+/* ==================== 导航项 ==================== */
+.rx-nav-item {
+  display: flex;
+  align-items: center;
+  gap: var(--rx-space-md);
+  padding: var(--rx-space-sm) var(--rx-space-lg);
+  border: none;
+  background: transparent;
+  color: var(--rx-fg-primary);
+  font-family: inherit;
+  font-size: var(--rx-font-md);
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+  transition: background var(--rx-transition-fast);
+  position: relative;
+}
+
+.rx-nav-item:hover {
+  background: var(--rx-bg-hover);
+}
+
+.rx-nav-item.active {
+  background: var(--rx-bg-active);
+  color: var(--rx-fg-primary);
+}
+
+.rx-nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--rx-accent);
+  border-radius: 0 2px 2px 0;
+}
+
+.rx-nav-icon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+/* ==================== 开关 Toggle ==================== */
+.rx-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rx-space-sm);
+  cursor: pointer;
+}
+
+.rx-toggle-switch {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  background: var(--rx-border);
+  border-radius: var(--rx-radius-full);
+  transition: background var(--rx-transition-fast);
+}
+
+.rx-toggle-switch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background: white;
+  border-radius: 50%;
+  transition: transform var(--rx-transition-fast);
+  box-shadow: var(--rx-shadow-sm);
+}
+
+.rx-toggle.active .rx-toggle-switch {
+  background: var(--rx-accent);
+}
+
+.rx-toggle.active .rx-toggle-switch::after {
+  transform: translateX(16px);
+}
+
+.rx-toggle-label {
+  font-size: var(--rx-font-sm);
+  color: var(--rx-fg-secondary);
+}
+
+/* ==================== 状态徽章 ==================== */
+.rx-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: var(--rx-radius-full);
+  font-size: var(--rx-font-xs);
+  font-weight: 500;
+}
+
+.rx-badge-success {
+  background: color-mix(in srgb, var(--rx-success) 20%, transparent);
+  color: var(--rx-success);
+}
+
+.rx-badge-warning {
+  background: color-mix(in srgb, var(--rx-warning) 20%, transparent);
+  color: var(--rx-warning);
+}
+
+.rx-badge-error {
+  background: color-mix(in srgb, var(--rx-error) 20%, transparent);
+  color: var(--rx-error);
+}
+
+/* ==================== 消息气泡 ==================== */
+.rx-message {
+  max-width: 85%;
+  padding: var(--rx-space-md) var(--rx-space-lg);
+  border-radius: var(--rx-radius-xl);
+  line-height: var(--rx-line-height-relaxed);
+  position: relative;
+}
+
+.rx-message-user {
+  background: color-mix(in srgb, var(--rx-btn-primary-bg) 25%, var(--rx-bg-input));
+  border: 1px solid color-mix(in srgb, var(--rx-border) 60%, transparent);
+  border-bottom-right-radius: var(--rx-radius-sm);
+}
+
+.rx-message-assistant {
+  background: color-mix(in srgb, var(--rx-bg-tertiary) 80%, var(--rx-bg-secondary));
+  border: 1px solid var(--rx-border-subtle);
+  border-bottom-left-radius: var(--rx-radius-sm);
+}
+
+.rx-message-meta {
+  font-size: var(--rx-font-xs);
+  color: var(--rx-fg-secondary);
+  margin-bottom: var(--rx-space-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* ==================== 工具调用 ==================== */
+.rx-tool-call {
+  margin: var(--rx-space-sm) 0;
+  border: 1px solid var(--rx-border);
+  border-radius: var(--rx-radius-md);
+  background: var(--rx-code-bg);
+  overflow: hidden;
+}
+
+.rx-tool-call summary {
+  padding: var(--rx-space-sm) var(--rx-space-md);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--rx-space-sm);
+  font-size: var(--rx-font-sm);
+  color: var(--rx-fg-secondary);
+  transition: background var(--rx-transition-fast);
+  user-select: none;
+}
+
+.rx-tool-call summary:hover {
+  background: var(--rx-bg-hover);
+  color: var(--rx-fg-primary);
+}
+
+.rx-tool-call-content {
+  padding: var(--rx-space-md);
+  border-top: 1px solid var(--rx-border);
+  font-size: var(--rx-font-sm);
+  color: var(--rx-fg-secondary);
+  max-height: 150px;
+  overflow: auto;
+}
+
+/* ==================== 思考面板 ==================== */
+.rx-thinking {
+  margin: var(--rx-space-sm) 0;
+  border: 1px dashed var(--rx-border);
+  border-radius: var(--rx-radius-lg);
+  background: color-mix(in srgb, var(--rx-code-bg) 60%, transparent);
+  overflow: hidden;
+}
+
+.rx-thinking summary {
+  padding: var(--rx-space-sm) var(--rx-space-md);
+  cursor: pointer;
+  color: var(--rx-fg-secondary);
+  font-size: var(--rx-font-sm);
+  user-select: none;
+}
+
+.rx-thinking-body {
+  padding: var(--rx-space-md);
+  border-top: 1px solid var(--rx-border);
+  font-size: var(--rx-font-sm);
+  color: var(--rx-fg-secondary);
+  max-height: 220px;
+  overflow: auto;
+  line-height: var(--rx-line-height-relaxed);
+  white-space: pre-wrap;
+}
+
+/* ==================== 加载动画 ==================== */
+@keyframes rx-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes rx-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes rx-fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes rx-slide-in {
+  from { opacity: 0; transform: translateX(-8px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.rx-animate-fade-in {
+  animation: rx-fade-in var(--rx-transition-normal) ease forwards;
+}
+
+.rx-animate-slide-in {
+  animation: rx-slide-in var(--rx-transition-normal) ease forwards;
+}
+
+.rx-animate-spin {
+  animation: rx-spin 1s linear infinite;
+}
+
+.rx-animate-pulse {
+  animation: rx-pulse 1.5s ease-in-out infinite;
+}
+
+/* ==================== 状态栏 ==================== */
+.rx-status-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--rx-space-sm);
+  padding: var(--rx-space-xs) var(--rx-space-md);
+  font-size: var(--rx-font-xs);
+  color: var(--rx-fg-secondary);
+  border-top: 1px solid var(--rx-border);
+}
+
+.rx-status-bar.working {
+  color: var(--rx-warning);
+}
+
+.rx-status-bar.done {
+  color: var(--rx-success);
+}
+
+.rx-status-bar.error {
+  color: var(--rx-error);
+}
+
+/* ==================== 空状态 ==================== */
+.rx-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--rx-space-2xl);
+  color: var(--rx-fg-secondary);
+  text-align: center;
+}
+
+.rx-empty-icon {
+  font-size: 48px;
+  margin-bottom: var(--rx-space-lg);
+  opacity: 0.5;
+}
+
+.rx-empty-title {
+  font-size: var(--rx-font-lg);
+  font-weight: 500;
+  margin-bottom: var(--rx-space-sm);
+}
+
+.rx-empty-description {
+  font-size: var(--rx-font-sm);
+  max-width: 300px;
+}
+
+/* ==================== Webview 页面基座 ==================== */
+.rx-webview {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  color-scheme: dark light;
+  font-family: var(--vscode-font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+  font-size: var(--rx-font-md);
+  line-height: var(--rx-line-height-normal);
+  color: var(--rx-fg-primary);
+  background: var(--rx-bg-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 原因：Webview 内所有页面都共用盒模型，避免聊天和设置页分别重复 reset。 */
+.rx-webview *,
+.rx-webview *::before,
+.rx-webview *::after {
+  box-sizing: border-box;
+}
+
+.rx-toolbar-button,
+.rx-icon-button {
+  transition:
+    background var(--rx-transition-fast),
+    color var(--rx-transition-fast),
+    border-color var(--rx-transition-fast),
+    transform var(--rx-transition-fast),
+    box-shadow var(--rx-transition-fast);
+}
+
+.rx-toolbar-button:hover:not(:disabled),
+.rx-icon-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: var(--rx-shadow-sm);
+}
+
+.rx-toolbar-button:active:not(:disabled),
+.rx-icon-button:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.rx-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rx-welcome-gradient {
+  background:
+    radial-gradient(circle at top, color-mix(in srgb, var(--rx-accent) 18%, transparent), transparent 42%),
+    linear-gradient(180deg, color-mix(in srgb, var(--rx-bg-secondary) 85%, transparent), var(--rx-bg-primary));
+}
+
+.rx-welcome-card {
+  width: min(100%, 380px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-color: var(--rx-border-subtle);
+  box-shadow: var(--rx-shadow-lg);
+  backdrop-filter: blur(8px);
+}
+
+.rx-card {
+  transition: border-color var(--rx-transition-fast), box-shadow var(--rx-transition-fast), transform var(--rx-transition-fast);
+}
+
+.rx-card:hover {
+  border-color: color-mix(in srgb, var(--rx-accent) 40%, var(--rx-border));
+}
+
+.rx-message {
+  box-shadow: var(--rx-shadow-sm);
+  animation: rx-fade-in var(--rx-transition-normal) ease forwards;
+}
+
+.rx-message-user {
+  box-shadow: 0 2px 10px color-mix(in srgb, var(--rx-btn-primary-bg) 16%, transparent);
+}
+
+.rx-message-assistant {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.10);
+}
+
+.rx-fade-panel {
+  animation: rx-fade-in var(--rx-transition-normal) ease forwards;
+}
+
+.rx-nav-item.active {
+  background: color-mix(in srgb, var(--rx-accent) 12%, transparent);
+  color: var(--rx-fg-primary);
+}
+
+.rx-nav-item.active .rx-nav-icon {
+  color: var(--rx-accent);
+}
+
+/* ==================== 响应式 ==================== */
+@media (max-width: 768px) {
+  :root {
+    --rx-space-lg: 12px;
+    --rx-space-xl: 16px;
+    --rx-space-2xl: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --rx-space-lg: 8px;
+    --rx-space-xl: 12px;
+    --rx-space-2xl: 16px;
+  }
+}

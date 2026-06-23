@@ -1,6 +1,8 @@
 import * as vscode from "vscode";
 import type { ReasonixExtensionContext } from "../../core/context";
 import type { ReasonixModule } from "../../core/module";
+import { webviewStyleRoots, webviewStyleUris } from "../../webview/assets";
+import { renderKiloSettingsHtml } from "../../webview/settings-webview";
 import { CloudSyncStore } from "../cloud-sync/cloud-sync-store";
 import type { CloudSyncConfig } from "../cloud-sync/sync-types";
 import {
@@ -29,10 +31,20 @@ export const SettingsModule: ReasonixModule = {
 };
 
 async function openSettings(ctx: ReasonixExtensionContext): Promise<void> {
-  const panel = vscode.window.createWebviewPanel("reasonixSettings", "Reasonix Settings", vscode.ViewColumn.One, { enableScripts: true, retainContextWhenHidden: true });
+  const panel = vscode.window.createWebviewPanel("reasonixSettings", "Kilo Settings", vscode.ViewColumn.One, {
+    enableScripts: true,
+    retainContextWhenHidden: true,
+    // 设置页只加载扩展构建产物中的共享样式，避免访问源码目录。
+    localResourceRoots: webviewStyleRoots(ctx.vscodeContext.extensionUri),
+  });
   const cloudStore = new CloudSyncStore(ctx);
   const providerStore = new ProviderStore(ctx);
-  panel.webview.html = renderSettingsHtml(cloudStore.getConfig(), providerStore.activeProvider(), !!(await cloudStore.getGithubToken()));
+  // 使用 Kilo Code 风格设置界面
+  panel.webview.html = renderKiloSettingsHtml({
+    provider: providerStore.activeProvider(),
+    cloudSync: cloudStore.getConfig(),
+    hasGithubToken: !!(await cloudStore.getGithubToken()),
+  }, "models", webviewStyleUris(panel.webview, ctx.vscodeContext.extensionUri));
   panel.webview.onDidReceiveMessage(async (message: SettingsWebviewMessage) => {
     if (message.command === "saveProvider" && message.provider) {
       const active = providerStore.activeProvider();

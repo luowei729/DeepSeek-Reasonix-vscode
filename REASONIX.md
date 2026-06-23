@@ -34,6 +34,7 @@ MIT-licensed. Node ≥22 required.
 | `examples/` | `basic-chat.ts`, `mcp-server-demo.ts`, etc. |
 | `benchmarks/` | Harvest + tau-bench harnesses |
 | `dashboard/` | Compiled dashboard SPA assets |
+| `vscode-extension/` | VS Code 扩展模块；`src/modules/` 放功能模块，`src/webview/` 放 Webview HTML 生成器，`src/webview/styles/` 放共享设计系统和 Codicons 样式 |
 | `data/` | Tokenizer data (`deepseek-tokenizer.json.gz`) |
 | `dist/` | Build output — **do not edit** |
 | `.github/` | CI + issue / PR templates |
@@ -50,6 +51,16 @@ npm run lint        # biome check src tests
 npm run lint:fix    # biome check --write src tests
 npm run format      # biome format --write src tests
 npm run typecheck   # tsc --noEmit
+```
+
+VS Code 扩展常用命令：
+
+```sh
+cd vscode-extension
+npm run build       # esbuild → dist/extension.js，并复制 Webview CSS 到 dist/webview/styles/
+npx tsc --noEmit    # 扩展 TypeScript 类型检查
+npm test            # 扩展 smoke test
+npm run package     # 打包 dist/reasonix-vscode.vsix（需根目录先 npm run build）
 ```
 
 `prepublishOnly`: lint → typecheck → test → build.

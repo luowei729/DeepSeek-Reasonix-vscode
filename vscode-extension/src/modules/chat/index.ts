@@ -4,6 +4,8 @@ import type { ReasonixModule } from "../../core/module";
 import { AcpClient, type AcpPermissionParams, type AcpUpdate } from "../../services/acp-client";
 import { ReasonixCliService } from "../../services/reasonix-cli";
 import { currentWorkspaceRoot } from "../../services/workspace-data";
+import { webviewStyleRoots, webviewStyleUris } from "../../webview/assets";
+import { renderKiloChatHtml } from "../../webview/chat-webview";
 import { PermissionStore } from "../permissions/permission-store";
 import {
   makeProviderId,
@@ -71,10 +73,14 @@ class ChatController implements vscode.Disposable, vscode.WebviewViewProvider {
 
   resolveWebviewView(webviewView: vscode.WebviewView): void | Thenable<void> {
     this.view = webviewView;
-    webviewView.webview.options = { enableScripts: true };
+    webviewView.webview.options = {
+      enableScripts: true,
+      // 只允许加载构建产物中的 Webview 样式，避免 Webview 访问源码目录或任意文件。
+      localResourceRoots: webviewStyleRoots(this.ctx.vscodeContext.extensionUri),
+    };
     webviewView.title = "聊天";
     webviewView.description = "Reasonix";
-    webviewView.webview.html = this.renderHtml();
+    webviewView.webview.html = this.renderHtml(webviewView.webview);
     webviewView.webview.onDidReceiveMessage((message: WebviewMessage) => this.handleWebviewMessage(message));
     webviewView.onDidDispose(() => {
       // Disposing the UI should not kill the ACP process mid-response; extension dispose handles cleanup.
@@ -111,8 +117,10 @@ class ChatController implements vscode.Disposable, vscode.WebviewViewProvider {
     this.panel = vscode.window.createWebviewPanel("reasonixChat", "Reasonix Chat", vscode.ViewColumn.Beside, {
       enableScripts: true,
       retainContextWhenHidden: true,
+      // 面板入口和侧栏入口共用同一套 dist/webview 样式资源，确保 UI 一致。
+      localResourceRoots: webviewStyleRoots(this.ctx.vscodeContext.extensionUri),
     });
-    this.panel.webview.html = this.renderHtml();
+    this.panel.webview.html = this.renderHtml(this.panel.webview);
     this.panel.onDidDispose(() => {
       this.panel = undefined;
     });
@@ -330,321 +338,18 @@ class ChatController implements vscode.Disposable, vscode.WebviewViewProvider {
     });
   }
 
-  private renderHtml(): string {
-    return renderChatHtml(new ProviderStore(this.ctx).activeProvider(), this.history.getActive(), this.history.list());
+  private renderHtml(webview: vscode.Webview): string {
+    // 使用 Kilo Code 风格聊天界面，并注入构建产物中的共享设计系统样式。
+    return renderKiloChatHtml({
+      active: this.history.getActive(),
+      sessions: this.history.list(),
+      provider: new ProviderStore(this.ctx).activeProvider(),
+      busy: this.busy,
+    }, webviewStyleUris(webview, this.ctx.vscodeContext.extensionUri));
   }
 
   private post(message: Record<string, unknown>): void {
     void this.view?.webview.postMessage(message);
     void this.panel?.webview.postMessage(message);
   }
-}
-
-function renderChatHtml(provider: ProviderConfig, active: ChatSessionRecord | undefined, sessions: ChatSessionRecord[]): string {
-  const status = providerStatus(provider);
-  const boot = JSON.stringify({ active, sessions, provider }).replace(/</g, "\\u003c");
-  return /* html */ `<!doctype html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Reasonix Chat</title>
-  <style>
-    :root { color-scheme: dark light; }
-    body { margin: 0; font-family: var(--vscode-font-family); color: var(--vscode-foreground); background: var(--vscode-editor-background); }
-    .shell { display: flex; flex-direction: column; height: 100vh; min-width: 0; overflow: hidden; }
-    .appbar { display: flex; align-items: center; gap: 8px; min-height: 38px; padding: 0 10px; border-bottom: 1px solid var(--vscode-panel-border); background: color-mix(in srgb, var(--vscode-sideBar-background) 88%, var(--vscode-editor-background)); }
-    .brand { font-size: 11px; font-weight: 700; letter-spacing: .08em; color: var(--vscode-descriptionForeground); }
-    .divider { width: 1px; height: 16px; background: var(--vscode-panel-border); }
-    .status { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--vscode-descriptionForeground); font-size: 12px; }
-    .feedWrap { flex: 1; overflow: hidden; background: var(--vscode-editor-background); }
-    .feed { height: 100%; overflow: auto; padding: 14px 12px 18px; display: flex; flex-direction: column; }
-    .msgRow { display: flex; width: 100%; margin: 0 0 8px; }
-    .msgRow.user { justify-content: flex-end; }
-    .msgRow.assistant { justify-content: flex-start; }
-    .msg { max-width: 88%; border: 1px solid color-mix(in srgb, var(--vscode-panel-border) 70%, transparent); border-radius: 14px; padding: 10px 14px; white-space: pre-wrap; line-height: 1.55; box-shadow: 0 1px 0 rgba(0,0,0,.08); }
-    .msgRow.user .msg { background: color-mix(in srgb, var(--vscode-button-background) 22%, var(--vscode-input-background)); border-bottom-right-radius: 4px; }
-    .msgRow.assistant .msg { background: color-mix(in srgb, var(--vscode-editorWidget-background) 90%, var(--vscode-sideBar-background)); border-bottom-left-radius: 4px; }
-    .msg.tool { color: var(--vscode-textPreformat-foreground); font-size: 12px; background: var(--vscode-textCodeBlock-background); }
-    .system { color: var(--vscode-editorError-foreground); }
-    .meta { color: var(--vscode-descriptionForeground); font-size: 11px; margin-bottom: 5px; text-transform: uppercase; letter-spacing: .03em; }
-    /* Thinking panel — collapsible reasoning display */
-    .thinking { margin: 6px 0 8px; border: 1px dashed var(--vscode-panel-border); border-radius: 10px; background: color-mix(in srgb, var(--vscode-textCodeBlock-background) 60%, transparent); }
-    .thinking summary { padding: 6px 12px; cursor: pointer; color: var(--vscode-descriptionForeground); font-size: 12px; user-select: none; border-radius: 10px; }
-    .thinking summary:hover { background: var(--vscode-list-hoverBackground); }
-    .thinking .body { padding: 8px 14px; max-height: 220px; overflow: auto; color: var(--vscode-descriptionForeground); font-size: 12px; white-space: pre-wrap; line-height: 1.5; border-top: 1px solid var(--vscode-panel-border); }
-    /* Inline settings modal */
-    .settingsOverlay { display: none; position: absolute; inset: 0; background: rgba(0,0,0,.45); z-index: 20; align-items: center; justify-content: center; }
-    .settingsOverlay.show { display: flex; }
-    .settingsPanel { background: var(--vscode-sideBar-background); border: 1px solid var(--vscode-panel-border); border-radius: 12px; padding: 20px; width: 92%; max-width: 380px; box-shadow: 0 8px 32px rgba(0,0,0,.3); max-height: 90vh; overflow: auto; }
-    .settingsPanel h2 { margin: 0 0 14px; font-size: 15px; }
-    .settingsPanel .field { margin: 0 0 12px; }
-    .settingsPanel label { display: block; font-size: 12px; color: var(--vscode-descriptionForeground); margin-bottom: 3px; }
-    .settingsPanel input, .settingsPanel select { display: block; width: 100%; box-sizing: border-box; padding: 6px 9px; border: 1px solid var(--vscode-input-border); border-radius: 6px; background: var(--vscode-input-background); color: var(--vscode-input-foreground); font-family: var(--vscode-font-family); }
-    .settingsPanel .actions { display: flex; gap: 8px; margin-top: 14px; }
-    .bottom { flex: none; padding: 8px 10px 10px; border-top: 1px solid var(--vscode-panel-border); background: color-mix(in srgb, var(--vscode-sideBar-background) 92%, var(--vscode-editor-background)); }
-    .sessionRow { display: flex; align-items: center; gap: 7px; min-height: 28px; margin-bottom: 7px; }
-    .currentSession { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--vscode-descriptionForeground); font-size: 12px; text-align: right; }
-    .composerCard { border: 1px solid var(--vscode-focusBorder); border-radius: 8px; background: var(--vscode-input-background); overflow: hidden; box-shadow: 0 0 0 1px rgba(0,0,0,.08); }
-    textarea { display: block; width: 100%; box-sizing: border-box; resize: vertical; min-height: 64px; max-height: 180px; color: var(--vscode-input-foreground); background: transparent; border: 0; outline: none; padding: 10px 11px 6px; font-family: var(--vscode-font-family); }
-    .composerToolbar { display: flex; align-items: center; gap: 6px; padding: 6px 7px 7px; }
-    .toolGroup { display: flex; gap: 6px; min-width: 0; flex-wrap: wrap; }
-    button { padding: 5px 9px; border-radius: 6px; border: 1px solid var(--vscode-button-border, var(--vscode-panel-border)); background: var(--vscode-button-secondaryBackground); color: var(--vscode-button-secondaryForeground); cursor: pointer; }
-    button:hover { background: var(--vscode-button-secondaryHoverBackground); }
-    .chip { max-width: 155px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .subtle { color: var(--vscode-descriptionForeground); }
-    .sendBtn { min-width: 38px; font-weight: 700; background: var(--vscode-button-background); color: var(--vscode-button-foreground); }
-    .spacer { flex: 1; }
-    @media (max-width: 560px) {
-      .brand { display: none; }
-      .sessionRow { flex-wrap: wrap; }
-      .currentSession { order: 4; width: 100%; text-align: left; }
-      .composerToolbar { flex-wrap: wrap; }
-      .sendBtn { margin-left: auto; }
-    }
-  </style>
-</head>
-<body>
-  <div class="shell">
-    <header class="appbar">
-      <span class="brand">REASONIX</span>
-      <span class="divider"></span>
-      <span id="status" class="status">${escapeHtml(status)}</span>
-      <span class="spacer"></span>
-      <button data-command="toggleSettings" title="窗口内设置">设置</button>
-    </header>
-    <main class="feedWrap">
-      <div id="feed" class="feed"></div>
-    </main>
-    <footer class="bottom">
-      <div class="sessionRow">
-        <button data-command="newSession">新会话</button>
-        <button data-command="pickSession">历史会话</button>
-        <button data-command="openReview" title="查看当前 Git Diff / Edit Review">Review</button>
-        <span class="spacer"></span>
-        <span id="currentSession" class="currentSession"></span>
-      </div>
-      <div class="composerCard">
-        <textarea id="input" placeholder="输入消息，Enter 发送，Shift+Enter 换行"></textarea>
-        <div class="composerToolbar">
-          <div class="toolGroup">
-            <button class="chip" data-command="configureProvider" id="providerChip">${escapeHtml(provider.name)}</button>
-            <button class="chip" data-command="selectModel" id="modelChip">${escapeHtml(provider.model)}</button>
-            <button class="chip" data-command="selectMode" id="modeChip">${escapeHtml(modeLabel(provider))}</button>
-            <button data-command="openIndexing" title="打开代码索引">索引</button>
-            <button data-command="openPermissions" title="管理权限规则">权限</button>
-            <button data-command="syncNow" title="立即加密云同步">同步</button>
-          </div>
-          <span class="spacer"></span>
-          <button class="subtle" data-command="cancel" title="取消回复">取消</button>
-          <button id="send" class="sendBtn" title="发送">发送</button>
-        </div>
-      </div>
-    </footer>
-    <!-- Inline settings modal — replaces top-bar showInputBox for provider config -->
-    <div id="settingsOverlay" class="settingsOverlay">
-      <div class="settingsPanel">
-        <h2>Reasonix 供应商配置</h2>
-        <div class="field"><label>供应商名称</label><input id="cfgName" placeholder="DeepSeek" /></div>
-        <div class="field"><label>API Base URL</label><input id="cfgBaseUrl" placeholder="https://api.deepseek.com" /></div>
-        <div class="field"><label>API Key / Token</label><input id="cfgApiKey" type="password" placeholder="留空保持已保存 Token" /></div>
-        <div class="field"><label>默认模型</label><input id="cfgModel" placeholder="deepseek-v4-flash" /></div>
-        <div class="field"><label>推理深度</label><select id="cfgReasoningEffort"><option value="default">默认</option><option value="high">high</option><option value="max">max</option></select></div>
-        <div class="field"><label>思考链 (thinking)</label><select id="cfgThinking"><option value="enabled">开启</option><option value="disabled">关闭</option></select></div>
-        <div class="actions">
-          <button id="cfgSave" style="background:var(--vscode-button-background);color:var(--vscode-button-foreground);">保存</button>
-          <button data-command="toggleSettings">关闭</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <script>
-    const vscode = acquireVsCodeApi();
-    const feed = document.getElementById('feed');
-    const input = document.getElementById('input');
-    const send = document.getElementById('send');
-    const status = document.getElementById('status');
-    const currentSession = document.getElementById('currentSession');
-    const settingsOverlay = document.getElementById('settingsOverlay');
-    const providerChip = document.getElementById('providerChip');
-    const modelChip = document.getElementById('modelChip');
-    const modeChip = document.getElementById('modeChip');
-    let state = ${boot};
-    let assistantBody = null;
-    let assistantRow = null;
-    let thinkingNode = null, thinkingBody = null;
-
-    function providerSummary(provider) {
-      if (!provider) return 'Reasonix';
-      return provider.name + ' / ' + provider.model + ' · effort=' + (provider.reasoningEffort || 'default') + ' · thinking=' + (provider.thinking || 'enabled');
-    }
-
-    function modeSummary(provider) {
-      if (!provider) return '模式';
-      return '模式 ' + (provider.reasoningEffort || 'default') + '/' + (provider.thinking || 'enabled');
-    }
-
-    /** Keep toolbar chips and inline settings fields in sync with extension state. */
-    function applyProvider(provider) {
-      if (!provider) return;
-      state.provider = provider;
-      status.textContent = providerSummary(provider);
-      providerChip.textContent = provider.name || 'Provider';
-      modelChip.textContent = provider.model || 'Model';
-      modeChip.textContent = modeSummary(provider);
-      document.getElementById('cfgName').value = provider.name || '';
-      document.getElementById('cfgBaseUrl').value = provider.baseUrl || '';
-      document.getElementById('cfgModel').value = provider.model || '';
-      document.getElementById('cfgReasoningEffort').value = provider.reasoningEffort || 'default';
-      document.getElementById('cfgThinking').value = provider.thinking || 'enabled';
-    }
-
-    function renderState() {
-      currentSession.textContent = state.active ? state.active.title + ' · ' + state.active.model : '尚无会话';
-      feed.innerHTML = '';
-      const messages = (state.active && state.active.messages) || [];
-      if (messages.length === 0) append('assistant', 'Reasonix', '输入问题后 reasonix acp 会驱动当前工作区。', false);
-      for (const msg of messages) append(msg.role, msg.role === 'user' ? '你' : 'Reasonix', msg.text, false);
-      feed.scrollTop = feed.scrollHeight;
-    }
-
-    function append(kind, label, text, scroll = true) {
-      const row = document.createElement('div');
-      const rowKind = kind === 'user' ? 'user' : 'assistant';
-      row.className = 'msgRow ' + rowKind;
-      const msg = document.createElement('div');
-      msg.className = 'msg ' + kind;
-      const meta = document.createElement('div');
-      meta.className = 'meta';
-      meta.textContent = label || kind;
-      const body = document.createElement('div');
-      body.textContent = text || '';
-      msg.append(meta, body);
-      row.append(msg);
-      feed.append(row);
-      if (scroll) feed.scrollTop = feed.scrollHeight;
-      return { row, node: msg, body };
-    }
-
-    /** Create or update a collapsible thinking panel in the feed. */
-    function ensureThinking() {
-      if (thinkingNode) return;
-      thinkingNode = document.createElement('details');
-      thinkingNode.className = 'thinking';
-      thinkingNode.open = false;
-      const summary = document.createElement('summary');
-      summary.textContent = '思考中…';
-      thinkingBody = document.createElement('div');
-      thinkingBody.className = 'body';
-      thinkingNode.append(summary, thinkingBody);
-      // Insert thinking before the assistant bubble so reasoning reads as a
-      // pre-answer trail instead of appearing after the final response.
-      feed.insertBefore(thinkingNode, assistantRow || null);
-      feed.scrollTop = feed.scrollHeight;
-    }
-
-    function finalizeThinking(text) {
-      if (!thinkingNode) return;
-      const summary = thinkingNode.querySelector('summary');
-      if (summary) summary.textContent = '思考过程 (' + (text || '').length + ' 字)';
-      thinkingNode.open = false;
-      thinkingNode = null; thinkingBody = null;
-    }
-
-    function submit() {
-      const text = input.value.trim();
-      if (!text) return;
-      input.value = '';
-      vscode.postMessage({ command: 'send', text });
-    }
-
-    send.addEventListener('click', submit);
-    input.addEventListener('keydown', (event) => {
-      if (event.key === 'Enter' && !event.shiftKey) {
-        event.preventDefault();
-        submit();
-      }
-    });
-    document.querySelectorAll('button[data-command]').forEach((button) => {
-      if (button.dataset.command === 'toggleSettings') {
-        button.addEventListener('click', () => {
-          applyProvider(state.provider);
-          settingsOverlay.classList.toggle('show');
-        });
-        return;
-      }
-      button.addEventListener('click', () => vscode.postMessage({ command: button.dataset.command }));
-    });
-
-    // Save provider from inline settings modal
-    document.getElementById('cfgSave').addEventListener('click', () => {
-      const data = {
-        name: document.getElementById('cfgName').value.trim(),
-        baseUrl: document.getElementById('cfgBaseUrl').value.trim(),
-        apiKey: document.getElementById('cfgApiKey').value.trim(),
-        model: document.getElementById('cfgModel').value.trim(),
-        reasoningEffort: document.getElementById('cfgReasoningEffort').value,
-        thinking: document.getElementById('cfgThinking').value,
-      };
-      if (!data.name || !data.baseUrl) return;
-      vscode.postMessage({ command: 'saveProvider', data });
-      settingsOverlay.classList.remove('show');
-    });
-
-    window.addEventListener('message', (event) => {
-      const message = event.data;
-      if (message.type === 'state') {
-        state = { ...state, active: message.active, sessions: message.sessions, provider: message.provider || state.provider, busy: !!message.busy };
-        applyProvider(state.provider);
-        renderState();
-      }
-      if (message.type === 'openSettings') {
-        applyProvider(message.provider || state.provider);
-        settingsOverlay.classList.add('show');
-      }
-      if (message.type === 'assistantStart') {
-        thinkingNode = null; thinkingBody = null; assistantRow = null;
-        const assistant = append('assistant', 'Reasonix', '');
-        assistantBody = assistant.body;
-        assistantRow = assistant.row;
-      }
-      if (message.type === 'assistantDelta' && assistantBody) assistantBody.textContent += message.text;
-      if (message.type === 'thinkingChunk') {
-        ensureThinking();
-        if (thinkingBody) thinkingBody.textContent += message.text;
-        status.textContent = '思考中…';
-      }
-      if (message.type === 'thinkingEnd') {
-        finalizeThinking(message.text);
-        status.textContent = '思考完成 →';
-      }
-      if (message.type === 'assistantDone') {
-        if (thinkingNode) finalizeThinking('');
-        assistantRow = null;
-        status.textContent = '完成 · ' + message.stopReason;
-      }
-      if (message.type === 'status') status.textContent = message.message;
-      if (message.type === 'tool') append('assistant', 'tool', message.message);
-      if (message.type === 'error') append('assistant', 'error', '[错误] ' + message.message);
-      if (message.type === 'providerSaved') applyProvider(message.provider);
-      feed.scrollTop = feed.scrollHeight;
-    });
-    renderState();
-    // Pre-fill inline settings modal from the active provider
-    applyProvider(state.provider);
-  </script>
-</body>
-</html>`;
-}
-
-function providerStatus(provider: ProviderConfig): string {
-  return `${provider.name} / ${provider.model} · effort=${provider.reasoningEffort} · thinking=${provider.thinking}`;
-}
-
-function modeLabel(provider: ProviderConfig): string {
-  return `模式 ${provider.reasoningEffort}/${provider.thinking}`;
-}
-
-function escapeHtml(value: string): string {
-  return value.replace(/[&<>"]/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[ch] ?? ch);
 }

@@ -1,0 +1,556 @@
+/**
+ * Reasonix VS Code 扩展 - Codicons 图标系统
+ *
+ * Codicons 是 VS Code 内置的图标字体
+ * 使用方式：<span class="codicon codicon-图标名称"></span>
+ *
+ * 参考: https://microsoft.github.io/vscode-codicons/
+ */
+
+@font-face {
+  font-family: 'codicon';
+  src: local('codicon'), local('Codicon');
+}
+
+.codicon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  contain: strict;
+  fill: currentColor;
+  box-sizing: border-box;
+}
+
+/* 基础大小 */
+.codicon-xs { font-size: 12px; }
+.codicon-sm { font-size: 14px; }
+.codicon-md { font-size: 16px; }
+.codicon-lg { font-size: 20px; }
+.codicon-xl { font-size: 24px; }
+
+/* 动画 */
+.codicon-spin {
+  animation: codicon-spin 1s linear infinite;
+}
+
+@keyframes codicon-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ==================== 常用图标映射 ==================== */
+
+/* 文件和文件夹 */
+.codicon-file { }
+.codicon-folder { }
+.codicon-folder-opened { }
+.codicon-file-code { }
+.codicon-file-json { }
+.codicon-file-md { }
+.codicon-file-pdf { }
+.codicon-file-binary { }
+.codicon-file-symlink-file { }
+
+/* 编辑操作 */
+.codicon-edit { }
+.codicon-pencil { }
+.codicon-clippy { }
+.codicon-copy { }
+.codicon-cut { }
+.codicon-paste { }
+.codicon-grip { }
+.codicon-plus { }
+.codicon-dash { }
+.codicon-chevron-right { }
+.codicon-chevron-down { }
+.codicon-chevron-left { }
+.codicon-chevron-up { }
+.codicon-arrow-right { }
+.codicon-arrow-left { }
+.codicon-arrow-up { }
+.codicon-arrow-down { }
+.codicon-sort-precedence { }
+.codicon-link { }
+.codicon-link-external { }
+
+/* 查看和显示 */
+.codicon-eye { }
+.codicon-eye-closed { }
+.codicon-hidden { }
+.codicon-browse { }
+.codicon-preview { }
+.codicon-ghost { }
+.codicon-symbol-property { }
+.codicon-symbol-variable { }
+.codicon-symbol-constant { }
+.codicon-symbol-key { }
+.codicon-symbol-value { }
+.codicon-symbol-operator { }
+
+/* 导航 */
+.codicon-home { }
+.codicon-globe { }
+.codicon-mirror { }
+.codicon-book { }
+.codicon-bookmark { }
+.codicon-library { }
+.codicon-compass { }
+.codicon-map { }
+.codicon-map-filled { }
+
+/* 聊��和消息 */
+.codicon-comment { }
+.codicon-comment-discussion { }
+.codicon-comment-unresolved { }
+.codicon-chat { }
+.codicon-chat-bubble { }
+.codicon-chat-bubble-text { }
+.codicon-mention { }
+.codicon-question-circle { }
+.codicon-info { }
+.codicon-warning { }
+.codicon-error { }
+.codicon-circle-filled { }
+.codicon-circle-outline { }
+.codicon-symbol-event { }
+.codicon-bell { }
+.codicon-bell-dot { }
+
+/* 搜索和查找 */
+.codicon-search { }
+.codicon-search-fuzzy { }
+.codicon-find { }
+.codicon-replace { }
+.codicon-regex { }
+.codicon-tag { }
+.codicon-tag-add { }
+.codicon-tag-remove { }
+
+/* 代码相关 */
+.codicon-code { }
+.codicon-code-tags { }
+.codicon-code-branch { }
+.codicon-git-compare { }
+.codicon-git-merge { }
+.codicon-git-pull-request { }
+.codicon-git-pull-request-create { }
+.codicon-git-commit { }
+.codicon-git-changes { }
+.codicon-symbol-class { }
+.codicon-symbol-interface { }
+.codicon-symbol-struct { }
+.codicon-symbol-enum { }
+.codicon-symbol-method { }
+.codicon-symbol-function { }
+.codicon-symbol-property2 { }
+.codicon-symbol-event { }
+.codicon-symbol-misc { }
+
+/* 调试和运行 */
+.codicon-debug-alt { }
+.codicon-debug-alt-small { }
+.codicon-play { }
+.codicon-debug-start { }
+.codicon-debug-pause { }
+.codicon-debug-stop { }
+.codicon-debug-restart { }
+.codicon-debug-continue { }
+.codicon-debug-step-over { }
+.codicon-debug-step-into { }
+.codicon-debug-step-out { }
+.codicon-debug-breakpoint { }
+.codicon-debug-breakpoint-unverified { }
+.codicon-debug-breakpoint-log { }
+.codicon-flame { }
+.codicon-zap { }
+
+/* 工具和设置 */
+.codicon-settings { }
+.codicon-settings-gear { }
+.codicon-triple-horizontal { }
+.codicon-swap-horizontal { }
+.codicon-swap-vertical { }
+.codicon-wrench { }
+.codicon-tools { }
+.codicon-hammer { }
+.codicon-lightbulb { }
+.codicon-lightbulb-autofix { }
+.codicon-package { }
+.codicon-package-dependents { }
+.codicon-package-dependencies { }
+.codicon-extensions { }
+.codicon-plug { }
+.codicon-plugin { }
+.codicon-key { }
+.codicon-keyboard { }
+
+/* 用户和团队 */
+.codicon-account { }
+.codicon-person { }
+.codicon-person-add { }
+.codicon-organization { }
+.codicon-team-workflow { }
+.codicon-heart { }
+.codicon-heart-filled { }
+.codicon-star { }
+.codicon-star-empty { }
+.codicon-star-full { }
+.codicon-star-half { }
+
+/* 时间 */
+.codicon-clock { }
+.codicon-history { }
+.codicon-calendar { }
+.codicon-calendar-today { }
+
+/* 网络和云 */
+.codicon-cloud { }
+.codicon-cloud-upload { }
+.codicon-cloud-download { }
+.codicon-symbol-string { }
+.codicon-wifi { }
+.codicon-offline { }
+
+/* 数据库 */
+.codicon-database { }
+.codicon-table { }
+.codicon-server { }
+.codicon-data { }
+
+/* 终端 */
+.codicon-terminal { }
+.codicon-terminal-linux { }
+.codicon-terminal-mac { }
+.codicon-terminal-windows { }
+
+/* 通知和状态 */
+.codicon-bell { }
+.codicon-bell-dot { }
+.codicon-mail { }
+.codicon-mail-read { }
+.codicon-mail-open { }
+.codicon-inbox { }
+.codicon-inbox-tray { }
+.codicon-send { }
+.codicon-filter { }
+.codicon-diff { }
+.codicon-diff-added { }
+.codicon-diff-removed { }
+.codicon-diff-modified { }
+.codicon-diff-renamed { }
+.codicon-check { }
+.codicon-check-all { }
+.codicon-circle-check { }
+.codicon-pass { }
+.codicon-valid { }
+.codicon-x { }
+.codicon-circle-x { }
+.codicon-close { }
+.codicon-dismiss { }
+.codicon-pass { }
+.codicon-ellipsis { }
+.codicon-ellipsis-v { }
+.codicon-moreVertical { }
+
+/* 项目 */
+.codicon-folder { }
+.codicon-folder-active { }
+.codicon-folder-opened { }
+.codicon-folder-download { }
+.codicon-folder-upload { }
+.codicon-new-file { }
+.codicon-new-folder { }
+.codicon-file-add { }
+.codicon-file-submodule { }
+.codicon-file-symlink-file { }
+
+/* 视图 */
+.codicon-layout { }
+.codicon-layout-activitybar-left { }
+.codicon-layout-activitybar-right { }
+.codicon-layout-panel-left { }
+.codicon-layout-panel-right { }
+.codicon-layout-panel-center { }
+.codicon-layout-sidebar-left { }
+.codicon-layout-sidebar-right { }
+.codicon-layout-statusbar { }
+.codicon-layout-centered { }
+.codicon-target { }
+.codicon-list-flat { }
+.codicon-list-tree { }
+.codicon-list-selection { }
+.codicon-listordered { }
+.codicon-list-unordered { }
+
+/* 通知 */
+.codicon-info { }
+.codicon-warning { }
+.codicon-error { }
+.codicon-primitive-square { }
+.codicon-primitive-dot { }
+.codicon-primitive-square-small { }
+.codicon-circle-large { }
+.codicon-circle-large-filled { }
+.codicon-circle-outline { }
+
+/* 符号 - 使用 VS Code 的 symbolKind 图标 */
+.codicon-symbol-boolean { }
+.codicon-symbol-null { }
+.codicon-symbol-number { }
+.codicon-symbol-object { }
+.codicon-symbol-operator { }
+.codicon-symbol-property { }
+.codicon-symbol-reference { }
+.codicon-symbol-snippet { }
+.codicon-symbol-text { }
+.codicon-symbol-unit { }
+.codicon-symbol-variable { }
+
+/* 箭头和方向 */
+.codicon-arrow-both { }
+.codicon-arrow-decision { }
+.codicon-arrow-down { }
+.codicon-arrow-down-left { }
+.codicon-arrow-down-right { }
+.codicon-arrow-left { }
+.codicon-arrow-right { }
+.codicon-arrow-small-down { }
+.codicon-arrow-small-left { }
+.codicon-arrow-small-right { }
+.codicon-arrow-small-up { }
+.codicon-arrow-swap { }
+.codicon-arrow-up { }
+.codicon-arrow-up-left { }
+.codicon-arrow-up-right { }
+.codicon-chevron-down { }
+.codicon-chevron-left { }
+.codicon-chevron-right { }
+.codicon-chevron-up { }
+.codicon-chevron-down-small { }
+.codicon-chevron-left-small { }
+.codicon-chevron-right-small { }
+.codicon-chevron-up-small { }
+
+/* 其他常用图标 */
+.codicon-undo { }
+.codicon-redo { }
+.codicon-clear-all { }
+.codicon-sync { }
+.codicon-sync-spin { }
+.codicon-split-horizontal { }
+.codicon-split-vertical { }
+.codicon-columns { }
+.codicon-rows { }
+.codicon-layout-sidebar { }
+.codicon-layout-panel { }
+.codicon-maximize { }
+.codicon-minimize { }
+.codicon-restore { }
+.codicon-zoom-in { }
+.codicon-zoom-out { }
+.codicon-close-all { }
+.codicon-menu { }
+.codicon-reporter { }
+.codicon-trash { }
+.codicon-remove { }
+.codicon-add { }
+.codicon-gist-secret { }
+.codicon-calendar { }
+.codicon-calendar-check { }
+.codicon-briefcase { }
+.codicon-calendar { }
+.codicon-combine { }
+.codicon-graph-left { }
+.codicon-graph-line { }
+.codicon-group-by-ref-type { }
+.codicon-ungroup-by-ref-type { }
+
+/* ==================== 简写别名 ==================== */
+
+/* 导航相关 */
+.icon-home::before { content: "\ebee"; font-family: codicon; }  /* home */
+.icon-settings::before { content: "\eb61"; font-family: codicon; }  /* settings-gear */
+.icon-search::before { content: "\ea7b"; font-family: codicon; }  /* search */
+
+/* 模型相关 */
+.icon-model::before { content: "\eb80"; font-family: codicon; }  /* symbol-class */
+.icon-robot::before { content: "\ebf7"; font-family: codicon; }  /* robot */
+.icon-ai::before { content: "\ebf7"; font-family: codicon; }  /* robot */
+
+/* 提供商相关 */
+.icon-cloud::before { content: "\eb61"; font-family: codicon; }  /* cloud */
+.icon-server::before { content: "\eb94"; font-family: codicon; }  /* server */
+
+/* 浏览器相关 */
+.icon-globe::before { content: "\ea78"; font-family: codicon; }  /* globe */
+.icon-browser::before { content: "\ea78"; font-family: codicon; }  /* globe */
+
+/* 数据库相关 */
+.icon-database::before { content: "\ea70"; font-family: codicon; }  /* database */
+.icon-storage::before { content: "\ea70"; font-family: codicon; }  /* database */
+
+/* 索引相关 */
+.icon-search::before { content: "\ea7b"; font-family: codicon; }  /* search */
+.icon-index::before { content: "\ea7b"; font-family: codicon; }  /* search */
+
+/* 通知相关 */
+.icon-bell::before { content: "\ea60"; font-family: codicon; }  /* bell */
+.icon-notification::before { content: "\ea60"; font-family: codicon; }  /* bell */
+
+/* 语言相关 */
+.icon-language::before { content: "\ea85"; font-family: codicon; }  /* globe */
+.icon-translate::before { content: "\ea85"; font-family: codicon; }  /* globe */
+
+/* 关于相关 */
+.icon-info::before { content: "\ea70"; font-family: codicon; }  /* info */
+
+.icon-check::before { content: "\ea60"; font-family: codicon; }  /* check */
+.icon-close::before { content: "\ea70"; font-family: codicon; }  /* close */
+.icon-ok::before { content: "\ea60"; font-family: codicon; }  /* check */
+
+/* 发送相关 */
+.icon-send::before { content: "\ea6f"; font-family: codicon; }  /* send */
+
+/* 加载相关 */
+.icon-loading::before { content: "\ea6c"; font-family: codicon; }  /* sync */
+
+/* 成功相关 */
+.icon-success::before { content: "\ea60"; font-family: codicon; }  /* check */
+.icon-done::before { content: "\ea60"; font-family: codicon; }  /* check */
+
+/* 文档相关 */
+.icon-docs::before { content: "\ea68"; font-family: codicon; }  /* book */
+.icon-document::before { content: "\ea68"; font-family: codicon; }  /* book */
+
+/* 工具相关 */
+.icon-tools::before { content: "\eb27"; font-family: codicon; }  /* tools */
+.icon-wrench::before { content: "\eb27"; font-family: codicon; }  /* tools */
+
+/* 用户相关 */
+.icon-user::before { content: "\ea77"; font-family: codicon; }  /* account */
+
+/* 时间相关 */
+.icon-clock::before { content: "\ea75"; font-family: codicon; }  /* clock */
+.icon-history::before { content: "\ea77"; font-family: codicon; }  /* history */
+
+/* 自动审批 */
+.icon-approve::before { content: "\ea60"; font-family: codicon; }  /* check */
+
+/* 声音相关 */
+.icon-voice::before { content: "\ea6e"; font-family: codicon; }  /* microphone */
+
+/* 刷新 */
+.icon-refresh::before { content: "\ea6c"; font-family: codicon; }  /* sync */
+
+/* 代码 */
+.icon-code::before { content: "\eb0b"; font-family: codicon; }  /* code */
+
+/* 调试 */
+.icon-debug::before { content: "\eb5a"; font-family: codicon; }  /* debug-alt */
+
+/* 灯泡/提示 */
+.icon-lightbulb::before { content: "\eb8a"; font-family: codicon; }  /* lightbulb */
+
+/* 错误 */
+.icon-error::before { content: "\ea71"; font-family: codicon; }  /* error */
+
+/* 星标 */
+.icon-star::before { content: "\ea6d"; font-family: codicon; }  /* star */
+
+/* 折叠/展开 */
+.icon-collapse::before { content: "\eabf"; font-family: codicon; }  /* chevron-down */
+.icon-expand::before { content: "\eabf"; font-family: codicon; }  /* chevron-down */
+
+/* 下拉箭头 */
+.icon-dropdown::before { content: "\eabf"; font-family: codicon; }  /* chevron-down */
+
+/* 键盘 */
+.icon-keyboard::before { content: "\ebd8"; font-family: codicon; }  /* keyboard */
+
+/* 实验相关 */
+.icon-experiment::before { content: "\ec2f"; font-family: codicon; }  /* flask */
+
+/* 关于 */
+.icon-about::before { content: "\ea70"; font-family: codicon; }  /* info */
+
+/* 保存 */
+.icon-save::before { content: "\ea6a"; font-family: codicon; }  /* save */
+
+/* 编辑 */
+.icon-edit::before { content: "\ea6b"; font-family: codicon; }  /* edit */
+
+/* ==================== Reasonix 实际使用的图标别名 ==================== */
+.rx-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1em;
+  height: 1em;
+  flex: 0 0 auto;
+  font-family: codicon, "Segoe UI Symbol", sans-serif;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.rx-icon::before {
+  display: inline-block;
+  font-family: codicon, "Segoe UI Symbol", sans-serif;
+  font-style: normal;
+  font-weight: normal;
+  text-align: center;
+}
+
+/* 原因：只维护当前 UI 用到的少量别名，避免空 Codicon 类让按钮显示为空。 */
+.rx-icon.icon-home::before { content: "\ebee"; }
+.rx-icon.icon-settings::before { content: "\eb52"; }
+.rx-icon.icon-search::before,
+.rx-icon.icon-index::before { content: "\ea6d"; }
+.rx-icon.icon-model::before { content: "\eb5b"; }
+.rx-icon.icon-robot::before,
+.rx-icon.icon-ai::before { content: "\eb95"; }
+.rx-icon.icon-cloud::before,
+.rx-icon.icon-provider::before { content: "\ebaa"; }
+.rx-icon.icon-server::before { content: "\eb50"; }
+.rx-icon.icon-globe::before,
+.rx-icon.icon-browser::before,
+.rx-icon.icon-language::before { content: "\eb01"; }
+.rx-icon.icon-save::before { content: "\eb4b"; }
+.rx-icon.icon-eye::before { content: "\ea70"; }
+.rx-icon.icon-keyboard::before { content: "\ebd8"; }
+.rx-icon.icon-bell::before,
+.rx-icon.icon-notification::before { content: "\eaa2"; }
+.rx-icon.icon-list::before,
+.rx-icon.icon-context::before { content: "\eac6"; }
+.rx-icon.icon-git-commit::before { content: "\ea86"; }
+.rx-icon.icon-experiment::before { content: "\ea79"; }
+.rx-icon.icon-info::before,
+.rx-icon.icon-about::before { content: "\ea74"; }
+.rx-icon.icon-check::before,
+.rx-icon.icon-ok::before,
+.rx-icon.icon-approve::before,
+.rx-icon.icon-success::before,
+.rx-icon.icon-done::before { content: "\eab2"; }
+.rx-icon.icon-close::before { content: "\ea76"; }
+.rx-icon.icon-send::before { content: "\ebac"; }
+.rx-icon.icon-loading::before,
+.rx-icon.icon-refresh::before { content: "\ea77"; }
+.rx-icon.icon-comment::before { content: "\ea6b"; }
+.rx-icon.icon-docs::before,
+.rx-icon.icon-document::before { content: "\eaa4"; }
+.rx-icon.icon-tools::before,
+.rx-icon.icon-wrench::before { content: "\eb51"; }
+.rx-icon.icon-user::before { content: "\ea67"; }
+.rx-icon.icon-clock::before,
+.rx-icon.icon-history::before { content: "\ea82"; }
+.rx-icon.icon-voice::before { content: "\ec1e"; }
+.rx-icon.icon-code::before { content: "\ea80"; }
+.rx-icon.icon-debug::before { content: "\eb91"; }
+.rx-icon.icon-lightbulb::before { content: "\ea61"; }
+.rx-icon.icon-error::before { content: "\ea87"; }
+.rx-icon.icon-star::before { content: "\ea6a"; }
+.rx-icon.icon-collapse::before,
+.rx-icon.icon-expand::before,
+.rx-icon.icon-dropdown::before { content: "\eab4"; }
+.rx-icon.icon-edit::before { content: "\ea73"; }
+.rx-icon.icon-branch::before,
+.rx-icon.icon-worktree::before { content: "\ea68"; }
